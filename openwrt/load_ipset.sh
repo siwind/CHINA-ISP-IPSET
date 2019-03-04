@@ -48,7 +48,7 @@ do
 	if [[ "$SCH" = "#" || -z "$line" ]]; then 
 		continue
 	fi
-	echo "start=$SCH, add CHINA-CMCC  $line"
+	#echo "start=$SCH, add CHINA-CMCC  $line"
 	ipset add $SETNAME $line
 done < $FILENAME
 
