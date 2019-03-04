@@ -12,12 +12,25 @@
 
 #FILENAME=../cmcc.txt
 
-run()
-{
-FILENAME=$1
-SETNAME=$2
+#======================================
+# Strip all leading and trailing spaces
+# Usage: 
+#		trim <string>
+trim() {
+    local var="$*"
+    # remove leading whitespace characters
+    var="${var#"${var%%[![:space:]]*}"}"
+    # remove trailing whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"   
+    echo -n "$var"
+}
 
-LNUM=`cat $FILENAME | wc -l`
+load()
+{
+local FILENAME=$1
+local SETNAME=$2
+
+local LNUM=`cat $FILENAME | wc -l`
 
 #echo "LINE NUMBER = $LNUM"
 
@@ -28,13 +41,14 @@ LNUM=$(($LNUM * 4))
 
 ipset create $SETNAME hash:net hashsize $LNUM
 
-while read -r line
+while read -r rline
 do
-	SCH=${line:0:1}
+	local line=$(trim $rline)
+	local SCH=${line:0:1}
 	if [[ "$SCH" = "#" || -z "$line" ]]; then 
 		continue
 	fi
-	#echo "start=$SCH, add CHINA-CMCC  $line"
+	echo "start=$SCH, add CHINA-CMCC  $line"
 	ipset add $SETNAME $line
 done < $FILENAME
 
@@ -67,7 +81,8 @@ if [ ! -f "$FILENAME" ]; then
 	exit
 fi
 
-run $FILENAME  $SETNAME
+load $FILENAME  $SETNAME
+
 }
 
 # shell entry to start
